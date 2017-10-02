@@ -1,0 +1,20 @@
+﻿<Properties StartupItem="Assembly-CSharp.csproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Script/Pattern.cs">
+    <Files>
+      <File FileName="Assets/Script/Cylinder.cs" Line="50" Column="55" />
+      <File FileName="Assets/Script/cylinderMove.cs" Line="1" Column="1" />
+      <File FileName="Assets/Script/PlayerControl.cs" Line="47" Column="25" />
+      <File FileName="Assets/Script/Pattern.cs" Line="23" Column="27" />
+      <File FileName="Assets/Script/ClockGenerator.cs" Line="1" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore>
+      <Breakpoint file="/Users/yuskyuki/development/Test/StepGame/StepGame/Assets/cylinderMove.cs" line="18" column="1" />
+      <Breakpoint file="/Users/yuskyuki/development/Test/StepGame/StepGame/Assets/cylinderMove.cs" line="34" column="1" />
+      <Breakpoint file="/Users/yuskyuki/development/Test/StepGame/StepGame/Assets/Script/cylinderScript.cs" line="12" column="1" />
+    </BreakpointStore>
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
