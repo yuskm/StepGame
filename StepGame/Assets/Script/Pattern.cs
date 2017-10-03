@@ -12,8 +12,9 @@ public class Pattern : MonoBehaviour {
 
 	// step 毎にコールされる
 	// <delay> sec ずらして、action すること
-	public void OnStep(float delay) {
+	public void OnStep(float delay, int step) {
 		Cylinder cylinder = GetComponent<Cylinder> ();
+		mCounter = step;
 
 		if (mStepState [mCounter]) {
 			AudioSource audioSource = GetComponent<AudioSource> ();
@@ -24,12 +25,19 @@ public class Pattern : MonoBehaviour {
 				cylinder.SetupEmission (Color.red, delay);
 			}
 		}
-		if (++mCounter >= mTotalStep) {
-			mCounter = 0;
+//[仮
+//		if (++mCounter >= mTotalStep) {
+//			mCounter = 0;
+//			if (cylinder.GetCylinderState () == Cylinder.cylinderState.Ready) {
+//				cylinder.SetStateStart ();
+//			}
+//		}
+		if ( mCounter == 0) {
 			if (cylinder.GetCylinderState () == Cylinder.cylinderState.Ready) {
 				cylinder.SetStateStart ();
 			}
 		}
+//]
 	}
 
 	// step sequencer の state を view に 渡す際に利用

@@ -17,9 +17,9 @@ public class PlayerControl : MonoBehaviour {
 	private readonly bool[][] mPattern = new bool[][]
 	{
 		new bool[]{ true,false,false,false, true,false,false,false, true,false,false,false, true,false,false,false},
-		new bool[]{false,false, true,false,false,false, true,false,false,false, true,false,false,false, true,false},
-		new bool[]{ true,false,false,false, true,false,false,false, true,false,false,false, true,false,false,false},
-		new bool[]{false,false, true,false,false,false, true,false,false,false, true,false,false,false, true,false}
+		new bool[]{ true,false, true,false, true,false, true,false, true,false, true,false, true,false, true,false},
+		new bool[]{false,false,false,false, true,false,false,false,false,false,false,false, true,false, true,false},
+		new bool[]{false,false,false,false,false,false, true,false,false,false,false,false,false,false, true,false}
 	};
 
 	private readonly Color[] mColor = new Color[] {
@@ -31,6 +31,7 @@ public class PlayerControl : MonoBehaviour {
 	private List<AudioClip> mAudioClip;
 
 	private int mCurrentInst;				// 操作中の inst  	                                       
+	private int mCurrentStep;
 
 //	// step sequencer の state を view に 渡す際に利用
 //	public List<bool> GetStepState(int idx) {
@@ -44,13 +45,17 @@ public class PlayerControl : MonoBehaviour {
 	// clock generator が step timing を通知 
 	public void OnStep(float delay) {
 		for (int i = 0; i <= mCurrentInst; i++) {
-			mInst[i].GetComponent<Pattern>().OnStep(delay);
+			mInst[i].GetComponent<Pattern>().OnStep(delay, mCurrentStep);
+		}
+		if (++mCurrentStep >= mStepCount) {
+			mCurrentStep = 0;
 		}
 	}
 		
 	// Use this for initialization
 	void Start () {
 		mCurrentInst = 0;
+		mCurrentStep = 0;
 
 		mStepState =  new List< List<bool> >( mInstCount );
 		for (int ii = 0; ii < mInstCount; ii++) {
@@ -62,10 +67,10 @@ public class PlayerControl : MonoBehaviour {
 		}
 			
 		mAudioClip = new List<AudioClip> (mInstCount);
-		mAudioClip.Add( (AudioClip) Resources.Load("HT",typeof(AudioClip) ) );
-		mAudioClip.Add( (AudioClip) Resources.Load("HT",typeof(AudioClip) ) );
-		mAudioClip.Add( (AudioClip) Resources.Load("HT",typeof(AudioClip) ) );
-		mAudioClip.Add( (AudioClip) Resources.Load("HT",typeof(AudioClip) ) );
+		mAudioClip.Add( (AudioClip) Resources.Load("Audio/BD",typeof(AudioClip) ) );
+		mAudioClip.Add( (AudioClip) Resources.Load("Audio/CH",typeof(AudioClip) ) );
+		mAudioClip.Add( (AudioClip) Resources.Load("Audio/SD",typeof(AudioClip) ) );
+		mAudioClip.Add( (AudioClip) Resources.Load("Audio/CYM",typeof(AudioClip) ) );
 
 		mInst = new List<GameObject>(mInstCount);
 
