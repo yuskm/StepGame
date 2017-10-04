@@ -8,6 +8,8 @@ public class Cylinder : MonoBehaviour {
 	private Light 		mLight;
 	private Color 		mColor;
 
+	private PlayerControl mPlayerControl;
+
 	public enum cylinderState {
 		Ready,
 		Start,
@@ -22,6 +24,9 @@ public class Cylinder : MonoBehaviour {
 		mRenderer = GetComponent<Renderer>();
 		mLight = GetComponent<Light>();
 		mState = cylinderState.Ready;
+
+		mPlayerControl = GameObject.Find ("Controller").GetComponent<PlayerControl>();
+		StartCoroutine("SetupEmissionB");
 	}
 
 	// Update is called once per frame
@@ -40,9 +45,11 @@ public class Cylinder : MonoBehaviour {
 	void OnCollisionEnter(Collision col) {
 		if (col.gameObject.name == ("Plane")) { 
 			Debug.Log ("GAME OVER!");
+			mPlayerControl.SetGameOver ();
 		} 
-		if (mState != cylinderState.Land) {
-			mState = cylinderState.Land;
+		if (mState == cylinderState.Fall) {
+			SetStateLand();
+			mPlayerControl.NextInst ();
 		}
 	}
 	// 衝突が終わったときに１度だけ呼ばれる関数
@@ -55,19 +62,28 @@ public class Cylinder : MonoBehaviour {
 		mRenderer.material.EnableKeyword("_EMISSION"); //キーワードの有効化を忘れずに
 		float alpha = 1.0f;
 		if ( mState == cylinderState.Ready ) {
-			alpha = 0.5f;
+			alpha = 0.3f;
 		}
 		mRenderer.material.SetColor("_EmissionColor", mColor * alpha ); // 光らせる
 		mLight.color = mColor;
 		mLight.intensity = 1.0f;
 		yield return new WaitForSeconds(0.2f); //1秒待って
-		mRenderer.material.SetColor("_EmissionColor", mColor * 0.0f); // 光らせる
+		mRenderer.material.SetColor("_EmissionColor", mColor * 0.0f); // 消す
 		mLight.intensity = 0.0f;
+	}
+
+	IEnumerator SetupEmissionB() {
+		while ( mState == cylinderState.Ready ) {
+			mRenderer.material.SetColor("_EmissionColor", mColor * 0.3f ); // 光らせる
+			yield return new WaitForSeconds(0.5f);
+		}
 	}
 
 	// beat に合わせて点灯
 	public void SetupEmission(Color color, float delay) {
-		StartCoroutine (SetupEmissionA(color, delay));  
+		if (mState != cylinderState.Ready) {
+			StartCoroutine (SetupEmissionA (color, delay)); 
+		}
 	}
 
 	// 方向転換
@@ -97,6 +113,11 @@ public class Cylinder : MonoBehaviour {
 	public void SetStateFall() {
 		if ( mState == cylinderState.Start ) {
 			mState = cylinderState.Fall;
+		}	
+	}
+	public void SetStateLand(bool force = false) {
+		if (  ( mState == cylinderState.Fall ) || force ) {
+			mState = cylinderState.Land;
 		}	
 	}
 }

@@ -9,10 +9,11 @@ using UnityEngine.EventSystems;
 public class PlayerControl : MonoBehaviour {
 
 	private const int mStepCount = 16;		// 16 step sequencer
-	private const int mInstCount = 1;   	// 4 inst [BD,SN,HH,CP]
+	private const int mInstCount = 4;   	// 4 inst [BD,SN,HH,CP]
 
 	private List< List<bool> > mStepState;	// 16 step x 4 inst 分の step data を保存
 	private List<GameObject>   mInst;		// inst
+	private CanvasText 	   	   mCanvasText;
 
 	private readonly bool[][] mPattern = new bool[][]
 	{
@@ -45,10 +46,15 @@ public class PlayerControl : MonoBehaviour {
 	// clock generator が step timing を通知 
 	public void OnStep(float delay) {
 		for (int i = 0; i <= mCurrentInst; i++) {
-			mInst[i].GetComponent<Pattern>().OnStep(delay, mCurrentStep);
+			mInst[i].GetComponent<Pattern>().OnStep(delay);
 		}
 		if (++mCurrentStep >= mStepCount) {
 			mCurrentStep = 0;
+
+			if (mInst [mCurrentInst].GetComponent<Cylinder> ().GetCylinderState() 
+				== Cylinder.cylinderState.Ready) {
+				SetGameStart ();
+			}
 		}
 	}
 		
@@ -74,6 +80,8 @@ public class PlayerControl : MonoBehaviour {
 
 		mInst = new List<GameObject>(mInstCount);
 
+		mCanvasText = GameObject.Find ("Text").GetComponent<CanvasText>();
+
 		// BD は土台に設置済みとする
 		GameObject cylinderRsc = (GameObject)Resources.Load("prefab/BDCylinder");
 		GameObject cylinder = Instantiate(cylinderRsc,new Vector3(0.0f, 0.2f, 0.0f), Quaternion.identity);
@@ -85,6 +93,7 @@ public class PlayerControl : MonoBehaviour {
 		}
 		mInst.Add(cylinder);
 		mInst [mCurrentInst].GetComponent<Cylinder> ().GetComponent<Rigidbody> ().useGravity = true;
+		mInst [mCurrentInst].GetComponent<Cylinder> ().SetStateLand (true);
 		mCurrentInst++;
 
 		// 初回は SN を落下
@@ -96,31 +105,67 @@ public class PlayerControl : MonoBehaviour {
 			pattern.SetStepState(i, mPattern[mCurrentInst][i]);
 		}
 		mInst.Add(cylinder);	
+		SetGameReady ();
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
 		if (Input.GetKeyDown (KeyCode.Space)) {
 			mInst [mCurrentInst].GetComponent<Cylinder> ().GetComponent<Rigidbody> ().useGravity = true;
+			SetGameFall ();
 		} 
-		if (Input.GetKeyDown (KeyCode.LeftShift)) {
-			if (mInst [mCurrentInst].GetComponent<Cylinder> ().GetCylinderState () != Cylinder.cylinderState.Land) {
-				return;
-			}
-
-			GameObject cylinderRsc = (GameObject)Resources.Load("prefab/BDCylinder");
-			GameObject cylinder = Instantiate(cylinderRsc,new Vector3(0.0f, 4.0f, 0.0f), Quaternion.identity);
-			cylinder.GetComponent<Cylinder>().SetupColor (mColor[mCurrentInst+1]);
-			Pattern pattern = cylinder.GetComponent<Pattern> ();
-			pattern.SetupClip (mAudioClip [mCurrentInst+1]);
-			for (int i = 0; i < mStepCount; i++) {
-				pattern.SetStepState(i, mPattern[mCurrentInst+1][i]);
-			}
-			mInst.Add(cylinder);
-			mCurrentInst++;
-		}
+//[仮
+//		if (Input.GetKeyDown (KeyCode.LeftShift)) {
+//			if (mInst [mCurrentInst].GetComponent<Cylinder> ().GetCylinderState () != Cylinder.cylinderState.Land) {
+//				return;
+//			}
+//
+//			GameObject cylinderRsc = (GameObject)Resources.Load("prefab/BDCylinder");
+//			GameObject cylinder = Instantiate(cylinderRsc,new Vector3(0.0f, 4.0f, 0.0f), Quaternion.identity);
+//			cylinder.GetComponent<Cylinder>().SetupColor (mColor[mCurrentInst+1]);
+//			Pattern pattern = cylinder.GetComponent<Pattern> ();
+//			pattern.SetupClip (mAudioClip [mCurrentInst+1]);
+//			for (int i = 0; i < mStepCount; i++) {
+//				pattern.SetStepState(i, mPattern[mCurrentInst+1][i]);
+//			}
+//			mInst.Add(cylinder);
+//			mCurrentInst++;
+//		}
+//]
 	}
 
 	public void NextInst() {
+		if (mCurrentInst < mInstCount - 1) {
+			GameObject cylinderRsc = (GameObject)Resources.Load ("prefab/BDCylinder");
+			GameObject cylinder = Instantiate (cylinderRsc, new Vector3 (0.0f, 4.0f, 0.0f), Quaternion.identity);
+			cylinder.GetComponent<Cylinder> ().SetupColor (mColor [mCurrentInst + 1]);
+			Pattern pattern = cylinder.GetComponent<Pattern> ();
+			pattern.SetupClip (mAudioClip [mCurrentInst + 1]);
+			for (int i = 0; i < mStepCount; i++) {
+				pattern.SetStepState (i, mPattern [mCurrentInst + 1] [i]);
+			}
+			mInst.Add (cylinder);
+			mCurrentInst++;
+			SetGameReady ();
+		}
+	}
+
+	public void SetGameReady() {
+		mCanvasText.SetText("Ready");
+		mCanvasText.Show (true);
+	}
+	public void SetGameStart() {
+		mInst [mCurrentInst].GetComponent<Cylinder> ().SetStateStart ();
+		mCanvasText.SetText("Push Space!");
+		mCanvasText.Show (true);
+	}
+	public void SetGameFall() {
+		mInst [mCurrentInst].GetComponent<Cylinder> ().SetStateFall ();
+		mCanvasText.SetText("");
+		mCanvasText.Show (false);
+	}
+	public void SetGameOver() {
+		mCanvasText.SetText("GAME OVER!");
+		mCanvasText.Show (true);
 	}
 }

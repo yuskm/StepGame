@@ -10,11 +10,16 @@ public class Pattern : MonoBehaviour {
 	private List<bool> mStepState;	
 	private GameObject mCylinder;
 
+	private PlayerControl mPlayerControl;
+
 	// step 毎にコールされる
 	// <delay> sec ずらして、action すること
-	public void OnStep(float delay, int step) {
+	public void OnStep(float delay) {
 		Cylinder cylinder = GetComponent<Cylinder> ();
-		mCounter = step;
+
+		if (cylinder.GetCylinderState () == Cylinder.cylinderState.Ready) {
+			return;
+		}
 
 		if (mStepState [mCounter]) {
 			AudioSource audioSource = GetComponent<AudioSource> ();
@@ -25,19 +30,10 @@ public class Pattern : MonoBehaviour {
 				cylinder.SetupEmission (Color.red, delay);
 			}
 		}
-//[仮
-//		if (++mCounter >= mTotalStep) {
-//			mCounter = 0;
-//			if (cylinder.GetCylinderState () == Cylinder.cylinderState.Ready) {
-//				cylinder.SetStateStart ();
-//			}
-//		}
-		if ( mCounter == 0) {
-			if (cylinder.GetCylinderState () == Cylinder.cylinderState.Ready) {
-				cylinder.SetStateStart ();
-			}
+
+		if (++mCounter >= mTotalStep) {
+			mCounter = 0;
 		}
-//]
 	}
 
 	// step sequencer の state を view に 渡す際に利用
@@ -64,15 +60,15 @@ public class Pattern : MonoBehaviour {
 		for (int i = 0; i < mTotalStep; i++) {
 			mStepState.Add (false);
 		}
+		mPlayerControl = GameObject.Find ("Controller").GetComponent<PlayerControl>();
+//[
+// instantiate は PlayerCotrol で
 //		GameObject CylinderRsc = (GameObject)Resources.Load("prefab/BDCylinder");
 //		mCylinder = Instantiate (CylinderRsc, new Vector3(0.0f, 0.2f, 0.0f), Quaternion.identity) as GameObject;	// 0.2 : y of Pedestral	
+//]
 	}
 	
 	// Update is called once per frame
 	void Update () {
-	}
-		
-	public void SetupCylinderColor(Color color) {
-		mCylinder.GetComponent<Cylinder>().SetupColor (color);
 	}
 }

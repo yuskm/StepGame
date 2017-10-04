@@ -51,6 +51,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Script\CanvasText.cs" />
      <Compile Include="Assets\Script\ClockGenerator.cs" />
      <Compile Include="Assets\Script\Cylinder.cs" />
      <Compile Include="Assets\Script\cylinderMove.cs" />
