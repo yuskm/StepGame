@@ -10,10 +10,12 @@ public class PlayerControl : MonoBehaviour {
 
 	private const int mStepCount = 16;		// 16 step sequencer
 	private const int mInstCount = 4;   	// 4 inst [BD,SN,HH,CP]
+	private int mCurrentInst;				// 操作中の inst  	                                       
+	private int mCurrentStep;				// 現在の step 
 
 	private List< List<bool> > mStepState;	// 16 step x 4 inst 分の step data を保存
 	private List<GameObject>   mInst;		// inst
-	private CanvasText 	   	   mCanvasText;
+	private CanvasText 	   	   mCanvasText;	// canvas 上に表示する文字列
 
 	private readonly bool[][] mPattern = new bool[][]
 	{
@@ -31,23 +33,13 @@ public class PlayerControl : MonoBehaviour {
 	};
 	private List<AudioClip> mAudioClip;
 
-	private int mCurrentInst;				// 操作中の inst  	                                       
-	private int mCurrentStep;
-
-//	// step sequencer の state を view に 渡す際に利用
-//	public List<bool> GetStepState(int idx) {
-//		return mTrack[mCurrentDisplay].GetComponent<Track> ().GetStepState ();
-//	}
-	// step sequencer の state を view が通知する際に利用する
-//	public void SetStepState(int idx, bool val) {
-//		mTrack[mCurrentDisplay].GetComponent<Track> ().SetStepState(idx,val);
-//	}
-
 	// clock generator が step timing を通知 
 	public void OnStep(float delay) {
 		for (int i = 0; i <= mCurrentInst; i++) {
 			mInst[i].GetComponent<Pattern>().OnStep(delay);
 		}
+
+		// 
 		if (++mCurrentStep >= mStepCount) {
 			mCurrentStep = 0;
 
@@ -110,30 +102,15 @@ public class PlayerControl : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
+		// space ボタンで落下開始
 		if (Input.GetKeyDown (KeyCode.Space)) {
 			mInst [mCurrentInst].GetComponent<Cylinder> ().GetComponent<Rigidbody> ().useGravity = true;
 			SetGameFall ();
 		} 
-//[仮
-//		if (Input.GetKeyDown (KeyCode.LeftShift)) {
-//			if (mInst [mCurrentInst].GetComponent<Cylinder> ().GetCylinderState () != Cylinder.cylinderState.Land) {
-//				return;
-//			}
-//
-//			GameObject cylinderRsc = (GameObject)Resources.Load("prefab/BDCylinder");
-//			GameObject cylinder = Instantiate(cylinderRsc,new Vector3(0.0f, 4.0f, 0.0f), Quaternion.identity);
-//			cylinder.GetComponent<Cylinder>().SetupColor (mColor[mCurrentInst+1]);
-//			Pattern pattern = cylinder.GetComponent<Pattern> ();
-//			pattern.SetupClip (mAudioClip [mCurrentInst+1]);
-//			for (int i = 0; i < mStepCount; i++) {
-//				pattern.SetStepState(i, mPattern[mCurrentInst+1][i]);
-//			}
-//			mInst.Add(cylinder);
-//			mCurrentInst++;
-//		}
-//]
 	}
 
+	// cylinder の OnCollisionEnter で呼ばれる。
+	// 次の inst へ進む。
 	public void NextInst() {
 		if (mCurrentInst < mInstCount - 1) {
 			GameObject cylinderRsc = (GameObject)Resources.Load ("prefab/BDCylinder");

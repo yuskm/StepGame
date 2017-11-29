@@ -17,6 +17,8 @@ public class Pattern : MonoBehaviour {
 	public void OnStep(float delay) {
 		Cylinder cylinder = GetComponent<Cylinder> ();
 
+		// PlayerControl が管理する global の current step が 0 に戻った時点で、
+		//  ready -> start 状態に遷移。それまでは、step increment しない。
 		if (cylinder.GetCylinderState () == Cylinder.cylinderState.Ready) {
 			return;
 		}
@@ -24,9 +26,7 @@ public class Pattern : MonoBehaviour {
 		if (mStepState [mCounter]) {
 			AudioSource audioSource = GetComponent<AudioSource> ();
 			audioSource.PlayDelayed (delay);
-
-			if(cylinder)
-			{
+			if(cylinder) {
 				cylinder.SetupEmission (Color.red, delay);
 			}
 		}

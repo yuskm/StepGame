@@ -56,7 +56,7 @@ public class Cylinder : MonoBehaviour {
 	void OnCollisionExit(Collision col){
 	}
 
-	// 光点灯
+	// start & fall 状態 の 光点灯 beat に合わせて点灯
 	IEnumerator SetupEmissionA(Color color, float delay) {
 		yield return new WaitForSeconds (delay);
 		mRenderer.material.EnableKeyword("_EMISSION"); //キーワードの有効化を忘れずに
@@ -72,10 +72,11 @@ public class Cylinder : MonoBehaviour {
 		mLight.intensity = 0.0f;
 	}
 
+	// ready 中 は 0.1 msec で点滅
 	IEnumerator SetupEmissionB() {
 		while ( mState == cylinderState.Ready ) {
 			mRenderer.material.SetColor("_EmissionColor", mColor * 0.3f ); // 光らせる
-			yield return new WaitForSeconds(0.5f);
+			yield return new WaitForSeconds(0.1f);
 		}
 	}
 
